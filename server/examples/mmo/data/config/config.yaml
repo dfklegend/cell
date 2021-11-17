@@ -1,0 +1,10 @@
+---
+exam.string: hello
+exam.int: 10
+message.compress: 0
+wsconfig:
+  certs:
+  - ""
+  - ""
+etcd:
+  Prefix: MMO

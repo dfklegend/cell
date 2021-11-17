@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+option go_package = "github.com/dfklegend/cell/rpc/protos";
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.helloworld";
+option java_outer_classname = "HelloWorldProto";
+
+package cellrpcprotos;
+
+// The RPC service definition.
+service RPCServer {
+  // Sends a greeting
+  rpc RPC(RPCRequest) returns (RPCReply) {}  
+  rpc PullAcks(PullAckRequest) returns (RPCAcks) {}
+}
+
+// The request message containing the user's name.
+message RPCRequest {   
+  // 客户端id
+  uint32 reqId = 1;     // 值
+  string clientId = 2;  //
+  string method = 3;
+  string message = 4;    
+  bool   needAck = 5; // 是否需要返回
+}
+
+// The normal response message 
+message RPCReply {  
+}
+
+message Dummy {  
+}
+
+message PullAckRequest {  
+  string clientId = 1;  // 客户端id
+}
+
+message RPCAcks {  
+  repeated RPCAck ack = 1; // 数组
+}
+
+message RPCAck {
+  uint32 reqId = 1;       // 请求id
+  string error = 2;       // 错误字符串(空串代表无错误)  
+  string message = 3;     // 返回的json编码  
+}

@@ -1,0 +1,23 @@
+---
+servers:  
+  gate-1:    
+    Type: gate
+    Frontend: true
+    WSClientAddress: 127.0.0.1:30011
+    ClientAddress: 127.0.0.1:30021
+    Address: 127.0.0.1:3001
+  gate-2:    
+    Type: gate
+    Frontend: true
+    WSClientAddress: 127.0.0.1:30012
+    ClientAddress: 127.0.0.1:30022
+    Address: 127.0.0.1:3002
+  chat-1:    
+    Type: chat
+    Frontend: false    
+    Address: 127.0.0.1:3011
+  chat-2:    
+    Type: chat
+    Frontend: false    
+    Address: 127.0.0.1:3012
+

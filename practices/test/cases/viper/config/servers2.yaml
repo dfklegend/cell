@@ -1,0 +1,12 @@
+servers:
+  logic-1:    
+    Type: logic
+    frontend: true
+    ClientAddress: 127.0.0.1:30000
+    Address: 127.0.0.1:3000
+  logic-2:    
+    Type: logic
+    frontend: true
+    ClientAddress: 127.0.0.1:30000
+    Address: 127.0.0.1:3000
+

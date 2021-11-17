@@ -1,0 +1,14 @@
+---
+servers:
+  logic-1:    
+    Type: logic
+    Frontend: true
+    WSClientAddress: 127.0.0.1:30011
+    ClientAddress: 127.0.0.1:30011
+    Address: 127.0.0.1:3001
+  logic-2:    
+    Type: logic
+    Frontend: true
+    ClientAddress: 127.0.0.1:30012
+    Address: 127.0.0.1:3002
+
