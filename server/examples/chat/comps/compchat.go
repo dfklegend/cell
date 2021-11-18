@@ -3,12 +3,12 @@ package comps
 import ( 
     "strings"
 
-    api "dfk.com/cell/rpc/apientry"
-    "dfk.com/cell/server/component"
-    "dfk.com/cell/server"
-    "dfk.com/cell/utils/logger"
+    api "github.com/dfklegend/cell/rpc/apientry"
+    "github.com/dfklegend/cell/server/component"
+    "github.com/dfklegend/cell/server"
+    "github.com/dfklegend/cell/utils/logger"
 
-    "dfk.com/cell/server/examples/chat/services"
+    "github.com/dfklegend/cell/server/examples/chat/services"
 )
 
 type CompChat struct {
