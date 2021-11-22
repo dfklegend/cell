@@ -65,3 +65,8 @@
 
     chat-client-go
     go 客户端
+
+
+# refs
+https://github.com/topfreegames/pitaya
+https://github.com/lonng/nano
