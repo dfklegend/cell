@@ -7,11 +7,11 @@ require go.etcd.io/etcd v0.0.0-20210226220824-aa7126864d82
 replace github.com/dfklegend/cell/utils => ../utils
 
 require (
+	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // indirect
+	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
 	github.com/dfklegend/cell/net v0.0.0-00010101000000-000000000000
 	github.com/dfklegend/cell/rpc v0.0.0-00010101000000-000000000000
 	github.com/dfklegend/cell/utils v0.0.0
-	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // indirect
-	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
 	github.com/google/uuid v1.1.4
 	github.com/kr/text v0.2.0 // indirect
 	github.com/nats-io/nats-server/v2 v2.1.2
@@ -24,6 +24,8 @@ require (
 )
 
 replace github.com/dfklegend/cell/rpc => ../rpc
+
+replace github.com/dfklegend/cell/client => ../client
 
 replace github.com/dfklegend/cell/net => ../net
 
