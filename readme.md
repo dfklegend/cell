@@ -38,10 +38,13 @@
 	. 更好的性能分析
 	. 进一步搭建模拟MMO工程，验证合适的模型
 
-	
-	
+
+
 
 # server/examples
+    需要安装etcd
+    https://github.com/etcd-io/etcd/releases
+    https://github.com/etcd-io/etcd/releases/download/v3.4.19/etcd-v3.4.19-windows-amd64.zip
 ## chat
 ### 功能
     可以通过浏览器启动chat-client/index.html来启动客户端
@@ -50,7 +53,7 @@
     聊天输入/roll可以掷骰子
     玩家进入服务器总是进入最前面的房间
     房间不会删除
-### 配置与启动   
+### 配置与启动
     data/config/servers.yaml
     配置了多个服务器
     使用id来启动不同的服务器类型
@@ -65,6 +68,7 @@
 
     chat-client-go
     go 客户端
+
 
 
 # refs
