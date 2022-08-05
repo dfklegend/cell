@@ -29,13 +29,17 @@ import (
 	"net"
 	"sync"
 	"sync/atomic"
-	"time"	
+	"time"
 
-	"github.com/dfklegend/cell/utils/logger"
-	"github.com/dfklegend/cell/utils/compression"
 	"github.com/dfklegend/cell/net/common/conn/codec"
-	"github.com/dfklegend/cell/net/common/conn/packet"
 	"github.com/dfklegend/cell/net/common/conn/message"
+	"github.com/dfklegend/cell/net/common/conn/packet"
+	"github.com/dfklegend/cell/utils/compression"
+	"github.com/dfklegend/cell/utils/logger"
+)
+
+const (
+	ReqeustTimeout = 15 * time.Second
 )
 
 var (
@@ -94,10 +98,10 @@ type CBTask func(error bool, msg *message.Message)
 //     pendingRequestsReaper
 //     		移除超时未返回的请求
 type Client struct {
-	conn            net.Conn
-	Connected       bool
+	conn      net.Conn
+	Connected bool
 	// 握手完毕
-	Ready 			bool
+	Ready           bool
 	packetEncoder   codec.PacketEncoder
 	packetDecoder   codec.PacketDecoder
 	packetChan      chan *packet.Packet
@@ -122,16 +126,16 @@ func (c *Client) ConnectedStatus() bool {
 }
 
 // New returns a new client
-func New(requestTimeout ...time.Duration) *Client {	
+func New(requestTimeout ...time.Duration) *Client {
 
-	reqTimeout := 5 * time.Second
+	reqTimeout := ReqeustTimeout
 	if len(requestTimeout) > 0 {
 		reqTimeout = requestTimeout[0]
 	}
 
 	return &Client{
 		Connected:       false,
-		Ready: 			 false,
+		Ready:           false,
 		packetEncoder:   codec.NewPomeloPacketEncoder(),
 		packetDecoder:   codec.NewPomeloPacketDecoder(),
 		packetChan:      make(chan *packet.Packet, 10),
@@ -178,7 +182,7 @@ func (c *Client) ConnectTo(addr string) error {
 		fmt.Printf("dial error:%v\n", err)
 		return err
 	}
-	return c.start(conn)	
+	return c.start(conn)
 }
 
 func (c *Client) start(conn net.Conn) error {
@@ -210,9 +214,9 @@ func (c *Client) sendHandshakeRequest() error {
 
 func (c *Client) beginRecvMessages() error {
 	c.Connected = true
-	
+
 	go c.readServerMessages()
-	go c.handlePackets()	
+	go c.handlePackets()
 
 	return nil
 }
@@ -254,7 +258,7 @@ func (c *Client) handleHandleShake(handshakePacket *packet.Packet) error {
 
 	logger.Log.Debug("connection ready")
 	// 握手成功
-	c.Ready = true;
+	c.Ready = true
 	go c.sendHeartbeats(handshake.Sys.Heartbeat)
 	go c.pendingRequestsReaper()
 	return nil
@@ -275,8 +279,11 @@ func (c *Client) pendingRequestsReaper() {
 				}
 			}
 			for _, pendingReq := range toDelete {
+
+				logger.Log.Infof("request timeout: %v", pendingReq.msg.ID)
 				err := errors.New("request timeout")
 				errMarshalled, _ := json.Marshal(err)
+
 				// send a timeout to incoming msg chan
 				m := &message.Message{
 					Type:  message.Response,
@@ -413,8 +420,6 @@ func (c *Client) sendHeartbeats(interval int) {
 	}
 }
 
-
-
 func (c *Client) beginHandshake() error {
 	if err := c.sendHandshakeRequest(); err != nil {
 		return err
@@ -429,7 +434,7 @@ func (c *Client) beginHandshake() error {
 // 等待连接完毕
 func (c *Client) WaitReady() {
 	for !c.Ready {
-		time.Sleep(100*time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
@@ -462,7 +467,7 @@ func (c *Client) sendMsg(msgType message.Type, route string, data []byte, cb CBT
 	// TODO mount msg and encode
 	if !c.Ready {
 		logger.Log.Errorf("sendMsg error, client not Ready: %v", route)
-		return 0, nil;
+		return 0, nil
 	}
 
 	m := message.Message{
