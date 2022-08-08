@@ -296,8 +296,15 @@ func (c *Client) pendingRequestsReaper() {
 					Msg: m,
 					Cb:  nil,
 				}
-				delete(c.pendingRequests, pendingReq.msg.ID)
-				<-c.pendingChan
+
+				var cbTask CBTask
+				pendingID := pendingReq.msg.ID
+				if req, ok := c.pendingRequests[pendingID]; ok {
+					cbTask = req.cb
+					delete(c.pendingRequests, pendingID)
+					<-c.pendingChan
+				}
+				nm.Cb = cbTask
 				c.IncomingMsgChan <- nm
 			}
 			c.pendingReqMutex.Unlock()
