@@ -32,11 +32,11 @@ func (self *APICollection) Register(e IAPIEntry, options ...Option) {
 	self.Entries.Register(e, options...)
 }
 
-func (self *APICollection) Build() error {	
+func (self *APICollection) Build() error {
 	// 初始化
-	//clear old 
+	//clear old
 	self.Containers = make(map[string]*APIContainer)
-	
+
 	entries := self.Entries.List()
 	for _, c := range entries {
 		err := self.newService(c.Entry, c.Opts...)
@@ -65,14 +65,15 @@ func (self *APICollection) newService(comp IAPIEntry, opts ...Option) error {
 	return nil
 }
 
-/** 
+// Call
+/**
  * 1. 转发给对应的Service
  * 2. 按目标参数类型反序列化
  * cb(error, []byte result)
  * 出入口都是[]byte (json序列化)
  * ext
  * 		一个自定义参数，目前是前端接口的session
- * 		
+ *
  *
  * 将请求转发给底层的各接口执行
  * @param route{string} 服务.method路由字符串
@@ -82,7 +83,7 @@ func (self *APICollection) newService(comp IAPIEntry, opts ...Option) error {
  *        		error 是否执行错误
  *        		outArt json序列化的返回值
  * @param ext{interace{}} 自定义参数，server:前端接口是session
-*/ 		
+ */
 func (self *APICollection) Call(route string, args []byte,
 	cbFunc HandlerCBFunc, ext interface{}) error {
 	subs := strings.Split(route, ".")

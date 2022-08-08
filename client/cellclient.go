@@ -1,15 +1,13 @@
-
-
 package client
 
-import (	
-	"time"
+import (
 	"reflect"
+	"time"
 
-	"github.com/dfklegend/cell/utils/logger"
-	"github.com/dfklegend/cell/utils/sche"
-	"github.com/dfklegend/cell/utils/runservice"	
 	nclient "github.com/dfklegend/cell/net/client"
+	"github.com/dfklegend/cell/utils/logger"
+	"github.com/dfklegend/cell/utils/runservice"
+	"github.com/dfklegend/cell/utils/sche"
 )
 
 const (
@@ -17,34 +15,34 @@ const (
 	STATE_CONNECTING
 	STATE_CONNECTED
 	STATE_BROKEN
-	STATE_PENDINGRETRY 		// 等待5s再重连
+	STATE_PENDINGRETRY // 等待5s再重连
 )
 
 type HandleFunc func()
 
 // add auto retry
 type CellClient struct {
-	TheClient	*nclient.Client
+	TheClient  *nclient.Client
 	runService *runservice.StandardRunService
-	state int
+	state      int
 	firstStart bool
-	autoRetry bool
+	autoRetry  bool
 
 	connectingTime int
-	retryWait int
-	tarAddress string
+	retryWait      int
+	tarAddress     string
 
-	cbBreak HandleFunc 
+	cbBreak     HandleFunc
 	cbConnected HandleFunc
 }
 
 func NewCellClient(name string) *CellClient {
-	return &CellClient {
-		TheClient: nclient.New(),
+	return &CellClient{
+		TheClient:  nclient.New(),
 		runService: runservice.NewStandardRunService(name),
 		firstStart: true,
-		autoRetry: true,
-		state: STATE_INIT,
+		autoRetry:  true,
+		state:      STATE_INIT,
 	}
 }
 
@@ -72,10 +70,10 @@ func (self *CellClient) SetCBConnected(cb HandleFunc) {
 	self.cbConnected = cb
 }
 
-func (self *CellClient) Start(address string) {	
+func (self *CellClient) Start(address string) {
 	if self.firstStart {
 		self.runService.Start()
-		self.runService.GetEventCenter().SetLocalUseChan(true)	
+		self.runService.GetEventCenter().SetLocalUseChan(true)
 		self.addUpdate()
 
 		self.firstStart = false
@@ -102,13 +100,13 @@ func (self *CellClient) Connect(address string) {
 
 func (self *CellClient) WaitReady() {
 	for !self.TheClient.Ready {
-		time.Sleep(100*time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
-func (self *CellClient) Stop() {	
+func (self *CellClient) Stop() {
 	self.autoRetry = false
-	self.TheClient.Disconnect()	
+	self.TheClient.Disconnect()
 	self.runService.Stop()
 }
 
@@ -125,16 +123,17 @@ func (self *CellClient) addMsgProcess() {
 			}
 
 			msg := v.Interface().(*nclient.ClientMsg)
-			
+
 			if msg.Cb != nil {
-				msg.Cb(false, msg.Msg)
+				// response
+				msg.Cb(msg.Msg.Err, msg.Msg)
 			} else {
 				// push msg
 				logger.Log.Debugf("got push:%v", msg.Msg)
-				Msg := msg.Msg				
+				Msg := msg.Msg
 				self.runService.GetEventCenter().Publish(Msg.Route, Msg.Data)
 			}
-	}))
+		}))
 }
 
 func (self *CellClient) addUpdate() {
@@ -144,7 +143,7 @@ func (self *CellClient) addUpdate() {
 }
 
 func (self *CellClient) onUpdate() {
-	switch(self.getState()) {
+	switch self.getState() {
 	case STATE_CONNECTING:
 		self.onConnecting()
 	case STATE_CONNECTED:
@@ -165,7 +164,7 @@ func (self *CellClient) onConnecting() {
 		}
 		return
 	}
-	self.connectingTime ++
+	self.connectingTime++
 	if self.connectingTime > 5 {
 		self.onBreak()
 	}
@@ -183,11 +182,11 @@ func (self *CellClient) onBreak() {
 
 func (self *CellClient) beginRetry() {
 	self.setState(STATE_PENDINGRETRY)
-	self.retryWait = 5	
+	self.retryWait = 5
 }
 
 func (self *CellClient) onPendingRetry() {
-	self.retryWait --
+	self.retryWait--
 	logger.Log.Debugf("reconnect wait:%v", self.retryWait)
 	if self.retryWait <= 0 {
 		logger.Log.Debugf("reconnect")
