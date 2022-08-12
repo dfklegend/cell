@@ -106,7 +106,7 @@ type Client struct {
 	packetDecoder   codec.PacketDecoder
 	packetChan      chan *packet.Packet
 	IncomingMsgChan chan *ClientMsg
-	pendingChan     chan bool
+	//pendingChan     chan bool
 	pendingRequests map[uint]*pendingRequest
 	pendingReqMutex sync.Mutex
 	requestTimeout  time.Duration
@@ -143,7 +143,7 @@ func New(requestTimeout ...time.Duration) *Client {
 		requestTimeout:  reqTimeout,
 		// 30 here is the limit of inflight messages
 		// TODO this should probably be configurable
-		pendingChan:    make(chan bool, 30),
+		//pendingChan:    make(chan bool, 30),
 		messageEncoder: message.NewMessagesEncoder(false),
 	}
 }
@@ -302,7 +302,7 @@ func (c *Client) pendingRequestsReaper() {
 				if req, ok := c.pendingRequests[pendingID]; ok {
 					cbTask = req.cb
 					delete(c.pendingRequests, pendingID)
-					<-c.pendingChan
+					//<-c.pendingChan
 				}
 				nm.Cb = cbTask
 				c.IncomingMsgChan <- nm
@@ -335,7 +335,7 @@ func (c *Client) handlePackets() {
 					if req, ok := c.pendingRequests[m.ID]; ok {
 						cbTask = req.cb
 						delete(c.pendingRequests, m.ID)
-						<-c.pendingChan
+						//<-c.pendingChan
 					} else {
 						c.pendingReqMutex.Unlock()
 						continue // do not process msg for already timedout request
@@ -486,7 +486,7 @@ func (c *Client) sendMsg(msgType message.Type, route string, data []byte, cb CBT
 	}
 	p, err := c.buildPacket(m)
 	if msgType == message.Request {
-		c.pendingChan <- true
+		//c.pendingChan <- true
 		c.pendingReqMutex.Lock()
 		if _, ok := c.pendingRequests[m.ID]; !ok {
 			c.pendingRequests[m.ID] = &pendingRequest{
